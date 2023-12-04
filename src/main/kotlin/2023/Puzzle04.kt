@@ -8,22 +8,25 @@ class Puzzle04 {
 
     fun getScoreCards(cardsStrings: List<String>): Int {
         val cardsNums = MutableList(cardsStrings.size) { 1 }
-        cardsStrings.map { it.toCard() }.toMutableList().forEachIndexed { cardIndex, card ->
-            (0..card.getIntersectionSize())
-                .forEachIndexed { index, value -> cardsNums[cardIndex + index + 1] += cardsNums[cardIndex] }
-        }
+        cardsStrings.map { it.toCard() }
+            .toMutableList()
+            .forEachIndexed { cardIndex, card ->
+                (0..card.getIntersectionSize())
+                    .forEach { cardsNums[cardIndex + it + 1] += cardsNums[cardIndex] }
+            }
         return cardsNums.sum()
     }
 
-    data class Card(val nums: List<Int>, val wins: List<Int>)
-
-    private fun Card.getScore() = pow(2.0, this.getIntersectionSize().toDouble()).toInt()
-    private fun Card.getIntersectionSize() = this.nums.intersect(this.wins).size - 1
+    data class Card(val nums: List<Int>, val wins: List<Int>) {
+        fun getScore() = pow(2.0, this.getIntersectionSize().toDouble()).toInt()
+        fun getIntersectionSize() = this.nums.intersect(this.wins).size - 1
+    }
 
     private fun String.toCard(): Card = Card(
-        this.substring(9).split("|")[0].trim().split("\\s+".toRegex()).map { it.toInt() }.toList(),
-        this.substring(9).split("|")[1].trim().split("\\s+".toRegex()).map { it.toInt() }.toList()
+        this.substring(9).split("|")[0].splitAndParse(),
+        this.substring(9).split("|")[1].splitAndParse()
     )
+    private fun String.splitAndParse() = this.trim().split("\\s+".toRegex()).map { it.toInt() }.toList()
 }
 
 fun main() {
